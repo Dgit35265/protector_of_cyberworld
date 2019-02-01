@@ -5,13 +5,13 @@ using UnityEngine;
 public class MapGenerator : MonoBehaviour
 {
 	private static int[,] mapData = null;
-	private GameObject tile = null;
-	private GameObject path = null;
+	private GameObject[] tile = null;
 
 	private void Awake()
 	{
-		tile = Resources.Load("Tile", typeof(GameObject)) as GameObject;
-		path = Resources.Load("Path", typeof(GameObject)) as GameObject;
+		tile = new GameObject[2];
+		tile[0] = Resources.Load("Tile", typeof(GameObject)) as GameObject;
+		tile[1] = Resources.Load("Path", typeof(GameObject)) as GameObject;
 	}
 
     private void Start()
@@ -23,17 +23,20 @@ public class MapGenerator : MonoBehaviour
 	{
 		if (mapData == null)
 		{
-			TextAsset mapInfo = Resources.Load("MapData", typeof(TextAsset)) as TextAsset;
-			string mapText = mapInfo.text;
-			Debug.Log(mapText);
-			char[] mapChar = mapText.ToCharArray();
+			TextAsset mapCSV = Resources.Load("MapData", typeof(TextAsset)) as TextAsset;
+			string[] column = mapCSV.text.Split('\n');
+			string[] row = column[0].Split(',');
+			mapData = new int[column.Length,row.Length];
 
-			/* convert map data text into int and generate map
-			for (int i = 2; i < mapChar[0]; i++)
+			//* convert map data text into int and generate map
+			for (int i = 0; i < column.Length; i++)
 			{
-				for (int j = 0; j < mapChar[1]; j++)
+				row = column[i].Split(',');
+				for (int j = 0; j < row.Length; j++)
 				{
-					//Depend on map text
+					mapData[i, j] = int.Parse(row[j]);
+					GameObject temp = (GameObject)Instantiate(tile[mapData[i,j]], new Vector3(j, 0, i), tile[mapData[i,j]].transform.rotation);
+					temp.transform.parent = transform;
 				}
 			}
 			//*/
